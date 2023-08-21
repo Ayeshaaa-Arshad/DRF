@@ -11,6 +11,3 @@ def home(request,*args,**kwargs):
     if model_data:
         data=model_to_dict(model_data)
     return Response(data)
-
-
-
