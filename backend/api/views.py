@@ -1,15 +1,25 @@
-from django.http import JsonResponse
 from products.models import Product
-from django.forms.models import model_to_dict
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from products.serializers import ProductSerializer
 # Create your views here.
 
-
-@api_view(["GET"])
+@api_view(["GET","POST"])
 def home(request, *args, **kwargs):
-    model_data = Product.objects.all().order_by("?").first()
-    data = {}
-    if model_data:
-        data = model_to_dict(model_data)
-    return Response(data)
+    if request.method=="GET":
+        instance = Product.objects.all().order_by("?").first()
+        data = {}
+        if instance:
+            serialized = ProductSerializer(instance)
+        return Response(serialized.data)
+
+    elif request.method == "POST":
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            print(serializer.data)
+            return Response(serializer.data)
+        return Response({"Invalid":"Data is invalid"},status=400)
+
+
+
